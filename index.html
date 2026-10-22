@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>University Auditorium Tickets</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>Interactive Venue Ticketing System</h1>
+  <p>Click a seat to inspect it, then press Add to Cart</p>
+</header>
+  <main class="layout">
+    <section class="map-panel" aria-label="Venue map">
+      <div class="map-controls" id="map-controls"></div>
+      <div class="viewport" id="viewport">
+        <div class="venue" id="venue"></div>
+      </div>
+      <ul class="legend" id="legend"></ul>
+    </section>
+    <aside class="side-panel">
+      <section class="card" id="seat-details" aria-live="polite">
+        <h2>Seat details</h2>
+        <p class="muted">Select a seat on the map</p>
+      </section>
+      <section class="card" id="cart">
+        <h2>Your cart</h2>
+        <p class="muted">Your cart is empty</p>
+        <p class="total">Total: $0 </p>
+      </section>
+    </aside>
+  </main>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
