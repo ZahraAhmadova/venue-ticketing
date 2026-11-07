@@ -13,7 +13,15 @@
 </header>
   <main class="layout">
     <section class="map-panel" aria-label="Venue map">
-      <div class="map-controls" id="map-controls"></div>
+      <div class="map-controls" id="map-controls" role="group" aria-label="Map controls">
+        <button type="button" id="zoom-in">Zoom In</button>
+        <button type="button" id="zoom-out">Zoom Out</button>
+        <button type="button" id="move-up">Move Up</button>
+        <button type="button" id="move-down">Move Down</button>
+        <button type="button" id="move-left">Move Left</button>
+        <button type="button" id="move-right">Move Right</button>
+        <button type="button" id="reset-view">Reset / Center View</button>
+</div>
       <div class="viewport" id="viewport">
         <div class="venue" id="venue"></div>
       </div>
