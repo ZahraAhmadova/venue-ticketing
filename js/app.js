@@ -111,11 +111,51 @@ function updateSeatElement(seat) {
 function updateAllSeats() {
   seats.forEach(updateSeatElement);
 }
+function inspectSeat(id) {
+  const previous = seatsById.get(inspectedId);
+  inspectedId = id;
+  if (previous) updateSeatElement(previous);
+  updateSeatElement(seatsById.get(id));
+  renderDetails();
+}
+
+function renderDetails() {
+  const seat = seatsById.get(inspectedId);
+  if (!seat) {
+    detailsEl.innerHTML = `<h2>Seat details</h2><p class="muted">Select a seat on the map.</p>`;
+    return;
+  }
+
+  const state = getSeatState(seat);
+  const statusText = {
+    available: "Available",
+    inspected: "Available",
+    "in-cart": "Already in your cart",
+    unavailable: "Unavailable (sold)"
+  }[state];
+
+  const canAdd = state === "inspected";
+
+  detailsEl.innerHTML = `
+    <h2>Seat details</h2>
+    <div class="detail-row"><span>Section</span><strong>${seat.sectionName}</strong></div>
+    <div class="detail-row"><span>Row</span><strong>${seat.row}</strong></div>
+    <div class="detail-row"><span>Seat</span><strong>${seat.number}</strong></div>
+    <div class="detail-row"><span>Category</span><strong>${seat.categoryLabel}</strong></div>
+    <div class="detail-row"><span>Price</span><strong>$${seat.price}</strong></div>
+    <div class="detail-row"><span>Status</span><strong>${statusText}</strong></div>
+    <button class="btn" id="add-btn" ${canAdd ? "" : "disabled"}>ADD TO CART</button>
+  `;
+  document.getElementById("add-btn").addEventListener("click", () => addToCart(seat.id));
+}
+
+function addToCart(id) {
+  console.log("Add to cart (coming next):", id);
+}
 function init() {
   generateSeats();
   renderVenue();
   renderLegend();
   updateAllSeats();
 }
-
 init();
