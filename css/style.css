@@ -24,13 +24,14 @@ body {
 }
 .viewport {
   height: 70vh;
-  overflow: auto;
+  overflow: hidden;
   background: #0e1018;
   border: 1px solid #2b2f45;
   border-radius: 10px;
 }
 .venue {
   position: relative;
+  transform-origin: 0 0;
 }
 .stage {
   position: absolute;
@@ -144,6 +145,23 @@ body {
   margin-right: .35rem;
   vertical-align: middle;
 }
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: .6rem;
+}
+.map-controls button {
+  padding: .45rem .8rem;
+  border: 1px solid #2b2f45;
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.map-controls button:hover { background: #2a2e45; }
+.map-controls button:focus-visible { outline: 2px solid #fff; }
 @media (max-width: 900px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
   .viewport { height: 55vh; }
