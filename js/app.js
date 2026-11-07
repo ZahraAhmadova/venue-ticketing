@@ -95,11 +95,27 @@ function renderLegend() {
   items.push('<li><span class="swatch" style="background:#444a5c"></span>Unavailable</li>');
   legendEl.innerHTML = items.join("");
 }
+function getSeatState(seat) {
+  if (seat.unavailable) return "unavailable";
+  if (cart.includes(seat.id)) return "in-cart";
+  if (seat.id === inspectedId) return "inspected";
+  return "available";
+}
 
+function updateSeatElement(seat) {
+  const state = getSeatState(seat);
+  seat.el.className = "seat " + state;
+  seat.el.setAttribute("aria-pressed", state === "inspected");
+}
+
+function updateAllSeats() {
+  seats.forEach(updateSeatElement);
+}
 function init() {
   generateSeats();
   renderVenue();
   renderLegend();
+  updateAllSeats();
 }
 
 init();
