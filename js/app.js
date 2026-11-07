@@ -1,14 +1,16 @@
-const seats = [];              
-const seatsById = new Map();   
+const seats = [];
+const seatsById = new Map();
 let inspectedId = null;
-const cart = [];              
+const cart = [];
 
 const venueEl   = document.getElementById("venue");
 const legendEl  = document.getElementById("legend");
 const detailsEl = document.getElementById("seat-details");
+const cartEl    = document.getElementById("cart");
+const STORAGE_KEY = "venue-ticketing-cart";
 
 function rowLetter(index) {
-  return String.fromCharCode(65 + index);   
+  return String.fromCharCode(65 + index);
 }
 
 function generateSeats() {
@@ -40,7 +42,7 @@ function generateSeats() {
           x: VENUE.focus.x + radius * Math.sin(rad),
           y: VENUE.focus.y + radius * Math.cos(rad),
           angle,
-          el: null              
+          el: null
         };
         seats.push(seat);
         seatsById.set(id, seat);
@@ -57,7 +59,7 @@ function renderVenue() {
   venueEl.innerHTML =
     `<div class="stage" style="left:${st.x}px;top:${st.y}px;width:${st.width}px;height:${st.height}px">STAGE</div>`;
 
-    VENUE.sections.forEach(section => {
+  VENUE.sections.forEach(section => {
     const midRad = ((section.fromAngle + section.toAngle) / 2) * Math.PI / 180;
     const labelRadius = section.labelRadius ?? (section.startRadius + section.rows * section.rowGap + 6);
     const label = document.createElement("div");
@@ -67,7 +69,8 @@ function renderVenue() {
     label.style.top  = (VENUE.focus.y + labelRadius * Math.cos(midRad)) + "px";
     venueEl.appendChild(label);
   });
-  const half = 12; 
+
+  const half = 12;
   seats.forEach(seat => {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -75,7 +78,7 @@ function renderVenue() {
     btn.dataset.id = seat.id;
     btn.style.left = (seat.x - half) + "px";
     btn.style.top  = (seat.y - half) + "px";
-    btn.style.setProperty("--rot", (-seat.angle) + "deg");   
+    btn.style.setProperty("--rot", (-seat.angle) + "deg");
     btn.style.setProperty("--cat", VENUE.categories[seat.category].color);
     btn.setAttribute(
       "aria-label",
@@ -95,6 +98,7 @@ function renderLegend() {
   items.push('<li><span class="swatch" style="background:#444a5c"></span>Unavailable</li>');
   legendEl.innerHTML = items.join("");
 }
+
 function getSeatState(seat) {
   if (seat.unavailable) return "unavailable";
   if (cart.includes(seat.id)) return "in-cart";
@@ -111,6 +115,7 @@ function updateSeatElement(seat) {
 function updateAllSeats() {
   seats.forEach(updateSeatElement);
 }
+
 function inspectSeat(id) {
   const previous = seatsById.get(inspectedId);
   inspectedId = id;
@@ -150,12 +155,86 @@ function renderDetails() {
 }
 
 function addToCart(id) {
-  console.log("Add to cart (coming next):", id);
+  const seat = seatsById.get(id);
+  if (!seat || seat.unavailable || cart.includes(id)) return;
+  cart.push(id);
+  saveCart();
+  updateSeatElement(seat);
+  renderDetails();
+  renderCart();
 }
+
+function removeFromCart(id) {
+  const index = cart.indexOf(id);
+  if (index === -1) return;
+  cart.splice(index, 1);
+  saveCart();
+  updateSeatElement(seatsById.get(id));
+  renderDetails();
+  renderCart();
+}
+
+function getTotal() {
+  return cart.reduce((sum, id) => sum + seatsById.get(id).price, 0);
+}
+
+function renderCart() {
+  if (cart.length === 0) {
+    cartEl.innerHTML = `
+      <h2>Your cart</h2>
+      <p class="muted">Your cart is empty</p>
+      <p class="total">Total: $0</p>
+    `;
+    return;
+  }
+
+  const rows = cart.map(id => {
+    const seat = seatsById.get(id);
+    return `
+      <li class="cart-item">
+        <span>${seat.sectionName}, Row ${seat.row}, Seat ${seat.number}</span>
+        <span class="cart-price">$${seat.price}</span>
+        <button type="button" class="remove-btn" data-id="${id}" aria-label="Remove ${seat.sectionName} row ${seat.row} seat ${seat.number} from cart">Remove</button>
+      </li>
+    `;
+  }).join("");
+
+  cartEl.innerHTML = `
+    <h2>Your cart (${cart.length})</h2>
+    <ul class="cart-list">${rows}</ul>
+    <p class="total">Total: $${getTotal()}</p>
+  `;
+
+  cartEl.querySelectorAll(".remove-btn").forEach(btn => {
+    btn.addEventListener("click", () => removeFromCart(btn.dataset.id));
+  });
+}
+
+function saveCart() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+  } catch (e) {}
+}
+
+function loadCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(saved)) return;
+    saved.forEach(id => {
+      const seat = seatsById.get(id);
+      if (seat && !seat.unavailable && !cart.includes(id)) cart.push(id);
+    });
+    saveCart();
+  } catch (e) {}
+}
+
 function init() {
   generateSeats();
+  loadCart();
   renderVenue();
   renderLegend();
   updateAllSeats();
+  renderCart();
 }
+
 init();
