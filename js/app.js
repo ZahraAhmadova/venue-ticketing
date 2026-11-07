@@ -7,6 +7,7 @@ const venueEl   = document.getElementById("venue");
 const legendEl  = document.getElementById("legend");
 const detailsEl = document.getElementById("seat-details");
 const cartEl    = document.getElementById("cart");
+const viewportEl = document.getElementById("viewport");
 const STORAGE_KEY = "venue-ticketing-cart";
 
 function rowLetter(index) {
@@ -246,15 +247,16 @@ function applyView() {
   clampView();
   venueEl.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
 }
-function zoomBy(factor) {
+function zoomAt(cx, cy, factor) {
   const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, view.scale * factor));
   const ratio = newScale / view.scale;
-  const cx = viewportEl.clientWidth / 2;
-  const cy = viewportEl.clientHeight / 2;
   view.x = cx - (cx - view.x) * ratio;
   view.y = cy - (cy - view.y) * ratio;
   view.scale = newScale;
   applyView();
+}
+function zoomBy(factor) {
+  zoomAt(viewportEl.clientWidth / 2, viewportEl.clientHeight / 2, factor);
 }
 function panBy(dx, dy) {
   view.x += dx;
@@ -284,6 +286,47 @@ function setupControls() {
     viewportEl.scrollLeft = 0;
   });
 }
+function setupMouse() {
+  let drag = null;
+  let moved = false;
+
+  viewportEl.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = viewportEl.getBoundingClientRect();
+    const delta = Math.max(-100, Math.min(100, e.deltaY));
+    zoomAt(e.clientX - rect.left, e.clientY - rect.top, Math.exp(-delta * 0.002));
+  }, { passive: false });
+  viewportEl.addEventListener("pointerdown", e => {
+    if (e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
+    moved = false;
+  });
+  window.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    const dy = e.clientY - drag.y;
+    if (!moved && Math.hypot(dx, dy) < 5) return;
+    moved = true;
+    viewportEl.classList.add("dragging");
+    view.x = drag.vx + dx;
+    view.y = drag.vy + dy;
+    applyView();
+  });
+  function endDrag() {
+    drag = null;
+    viewportEl.classList.remove("dragging");
+  }
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+
+  viewportEl.addEventListener("click", e => {
+    if (moved) {
+      e.stopPropagation();
+      e.preventDefault();
+      moved = false;
+    }
+  }, true);
+}
 function init() {
   generateSeats();
   loadCart();
@@ -294,5 +337,4 @@ function init() {
   setupControls();
   resetView();
 }
-
 init();

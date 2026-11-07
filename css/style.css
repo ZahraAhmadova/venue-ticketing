@@ -28,7 +28,12 @@ body {
   background: #0e1018;
   border: 1px solid #2b2f45;
   border-radius: 10px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
 }
+.viewport.dragging,
+.viewport.dragging .seat { cursor: grabbing; }
 .venue {
   position: relative;
   transform-origin: 0 0;
