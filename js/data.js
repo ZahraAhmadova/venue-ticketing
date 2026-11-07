@@ -1,9 +1,9 @@
 const VENUE = {
   name: "Auditorium",
 
-  world: { width: 1200, height: 720 },   
-  focus: { x: 600, y: 30 },             
-  seatSpacing: 30,                      
+  world: { width: 1200, height: 720 },
+  focus: { x: 600, y: 30 },
+  seatSpacing: 30,
 
   stage: { x: 450, y: 0, width: 300, height: 80 },
 
@@ -16,9 +16,9 @@ const VENUE = {
     { id: "fc", name: "Front Center",       category: "premium",  rows: 7, startRadius: 194, rowGap: 32, fromAngle: -24, toAngle: 24, labelRadius: 150 },
     { id: "wl", name: "Left Wing",          category: "standard", rows: 8, startRadius: 200, rowGap: 32, fromAngle: -66, toAngle: -30, labelRadius: 150 },
     { id: "wr", name: "Right Wing",         category: "standard", rows: 8, startRadius: 200, rowGap: 32, fromAngle: 30,  toAngle: 66,  labelRadius: 150 },
-    { id: "ul", name: "Upper Tier Left",    category: "economy",  rows: 5, startRadius: 470, rowGap: 32, fromAngle: -66, toAngle: -30 },
+    { id: "ul", name: "Upper Tier Left",    category: "economy",  rows: 5, startRadius: 470, rowGap: 32, fromAngle: -66, toAngle: -30, labelRadius: 690 },
     { id: "uc", name: "Upper Tier Center",  category: "economy",  rows: 5, startRadius: 430, rowGap: 32, fromAngle: -24, toAngle: 24 },
-    { id: "ur", name: "Upper Tier Right",   category: "economy",  rows: 5, startRadius: 470, rowGap: 32, fromAngle: 30,  toAngle: 66 }
+    { id: "ur", name: "Upper Tier Right",   category: "economy",  rows: 5, startRadius: 470, rowGap: 32, fromAngle: 30,  toAngle: 66,  labelRadius: 690 }
   ],
   unavailable: [
     "fc-C3", "fc-C4", "fc-D5", "wl-B2",
