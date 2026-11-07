@@ -227,7 +227,63 @@ function loadCart() {
     saveCart();
   } catch (e) {}
 }
+const view = { scale: 1, x: 0, y: 0 };
+const ZOOM_STEP = 1.25;
+const PAN_STEP = 80;
+const MIN_SCALE = 0.3;
+const MAX_SCALE = 3;
+const KEEP_VISIBLE = 0.25;
 
+function clampView() {
+  const vw = viewportEl.clientWidth;
+  const vh = viewportEl.clientHeight;
+  const ww = VENUE.world.width * view.scale;
+  const wh = VENUE.world.height * view.scale;
+  view.x = Math.min(vw - ww * KEEP_VISIBLE, Math.max(-ww * (1 - KEEP_VISIBLE), view.x));
+  view.y = Math.min(vh - wh * KEEP_VISIBLE, Math.max(-wh * (1 - KEEP_VISIBLE), view.y));
+}
+function applyView() {
+  clampView();
+  venueEl.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+}
+function zoomBy(factor) {
+  const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, view.scale * factor));
+  const ratio = newScale / view.scale;
+  const cx = viewportEl.clientWidth / 2;
+  const cy = viewportEl.clientHeight / 2;
+  view.x = cx - (cx - view.x) * ratio;
+  view.y = cy - (cy - view.y) * ratio;
+  view.scale = newScale;
+  applyView();
+}
+function panBy(dx, dy) {
+  view.x += dx;
+  view.y += dy;
+  applyView();
+}
+function resetView() {
+  const vw = viewportEl.clientWidth;
+  const vh = viewportEl.clientHeight;
+  const fit = Math.min(vw / VENUE.world.width, vh / VENUE.world.height);
+  view.scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, fit));
+  view.x = (vw - VENUE.world.width * view.scale) / 2;
+  view.y = (vh - VENUE.world.height * view.scale) / 2;
+  applyView();
+}
+function setupControls() {
+  document.getElementById("zoom-in").addEventListener("click", () => zoomBy(ZOOM_STEP));
+  document.getElementById("zoom-out").addEventListener("click", () => zoomBy(1 / ZOOM_STEP));
+  document.getElementById("move-up").addEventListener("click", () => panBy(0, PAN_STEP));
+  document.getElementById("move-down").addEventListener("click", () => panBy(0, -PAN_STEP));
+  document.getElementById("move-left").addEventListener("click", () => panBy(PAN_STEP, 0));
+  document.getElementById("move-right").addEventListener("click", () => panBy(-PAN_STEP, 0));
+  document.getElementById("reset-view").addEventListener("click", resetView);
+  window.addEventListener("resize", applyView);
+  viewportEl.addEventListener("scroll", () => {
+    viewportEl.scrollTop = 0;
+    viewportEl.scrollLeft = 0;
+  });
+}
 function init() {
   generateSeats();
   loadCart();
@@ -235,6 +291,8 @@ function init() {
   renderLegend();
   updateAllSeats();
   renderCart();
+  setupControls();
+  resetView();
 }
 
 init();
