@@ -331,6 +331,7 @@ function init() {
   updateAllSeats();
   renderCart();
   setupControls();
+  setupMouse();
   resetView();
 }
 init();
