@@ -70,7 +70,6 @@ function renderVenue() {
     label.style.top  = (VENUE.focus.y + labelRadius * Math.cos(midRad)) + "px";
     venueEl.appendChild(label);
   });
-
   const half = 12;
   seats.forEach(seat => {
     const btn = document.createElement("button");
@@ -90,7 +89,6 @@ function renderVenue() {
     venueEl.appendChild(btn);
   });
 }
-
 function renderLegend() {
   const items = Object.values(VENUE.categories).map(c =>
     `<li><span class="swatch" style="background:${c.color}"></span>${c.label} – $${c.price}</li>`
@@ -99,32 +97,30 @@ function renderLegend() {
   items.push('<li><span class="swatch" style="background:#444a5c"></span>Unavailable</li>');
   legendEl.innerHTML = items.join("");
 }
-
 function getSeatState(seat) {
   if (seat.unavailable) return "unavailable";
   if (cart.includes(seat.id)) return "in-cart";
   if (seat.id === inspectedId) return "inspected";
   return "available";
 }
-
 function updateSeatElement(seat) {
   const state = getSeatState(seat);
   seat.el.className = "seat " + state;
   seat.el.setAttribute("aria-pressed", state === "inspected");
 }
-
 function updateAllSeats() {
   seats.forEach(updateSeatElement);
 }
-
 function inspectSeat(id) {
   const previous = seatsById.get(inspectedId);
   inspectedId = id;
   if (previous) updateSeatElement(previous);
   updateSeatElement(seatsById.get(id));
   renderDetails();
+  if (window.matchMedia("(max-width: 900px)").matches) {
+    detailsEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 }
-
 function renderDetails() {
   const seat = seatsById.get(inspectedId);
   if (!seat) {
@@ -231,7 +227,7 @@ function loadCart() {
 const view = { scale: 1, x: 0, y: 0 };
 const ZOOM_STEP = 1.25;
 const PAN_STEP = 80;
-const MIN_SCALE = 0.3;
+const MIN_SCALE = 0.2;
 const MAX_SCALE = 3;
 const KEEP_VISIBLE = 0.25;
 
